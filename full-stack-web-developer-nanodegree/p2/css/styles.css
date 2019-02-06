@@ -1,0 +1,215 @@
+/* Base styles */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  min-height: 100%;
+  background-color: #f4f5f7;
+}
+
+/* General */
+body {
+  font-family: Helvetica, Roboto, Georgia;
+  font-size: 20px;
+  height: 100%;
+}
+
+.horizontal-rule {
+  width: 40%;
+  border-shadow: 2px;
+  opacity: 0.5;
+}
+
+h2 {
+  margin-bottom: 2rem;
+  font-size: 2.5rem;
+}
+
+.section-title {
+  margin-bottom: 4rem;
+}
+
+/* Navbar */
+.navbar-brand {
+  font-size: 1.8rem;
+  margin-right: 1rem;
+}
+
+/* Home Section */
+#home {
+  min-height: 400px;
+  background: linear-gradient(#343a40, #92c3f4);
+  padding-top: 40vh;
+  padding-bottom: 5rem;
+  color: #fff;
+}
+
+#home .heading {
+  z-index: 1;
+}
+
+#home .horizontal-rule {
+  border-color: #fff;
+}
+
+#home h1.main-heading {
+  font-size: 3rem;
+}
+
+#home h4.sub-heading {
+  font-weight: normal;
+  font-size: 1.8rem;
+}
+
+/* About Section */
+#about {
+  min-height: 300px;
+  padding-top: 8rem;
+  padding-bottom: 5rem;
+}
+
+#about .horizontal-rule {
+  border-color: #222;
+  opacity: 0.3;
+}
+
+#about .profile-picture {
+  border: 1px solid #000;
+  width: 12rem;
+  height: 12rem;
+  border-radius: 50%;
+}
+
+#about .description {
+  width: 80%;
+  margin-top: 2rem;
+}
+
+/* Portfolio Section */
+#portfolio {
+  min-height: 600px;
+  background-color: #e9eaea;
+  padding-top: 8rem;
+  padding-bottom: 5rem;
+}
+
+#portfolio .horizontal-rule {
+  border-color: #222;
+  opacity: 0.3;
+}
+
+#portfolio .row {
+  margin: 1rem 0;
+}
+
+#portfolio .portfolio-items-container .img-thumbnail {
+  width: 100%;
+  min-width: 100%;
+  max-width: 100%;
+  min-height: 100%;
+  max-height: 100%;
+  transition: all 0.4s linear; /* vendorless fallback */
+  -o-transition: all 0.4s linear; /* opera */
+  -ms-transition: all 0.4s linear; /* IE 10 */
+  -moz-transition: all 0.4s linear; /* Firefox */
+  -webkit-transition: all 0.4s linear; /*safari and chrome */
+}
+
+#portfolio .portfolio-item {
+  margin: 1.5rem 0;
+  padding: 0.5rem;
+}
+
+#portfolio .portfolio-items-container:hover .img-thumbnail:not(hover){
+  opacity: 0.5;
+}
+
+#portfolio .portfolio-items-container:hover .img-thumbnail:hover {
+  box-shadow: 2px 2px 10px #888888;
+  opacity: 1.0;
+}
+
+#portfolio img {
+  width: 100%;
+  min-width: 100%;
+  max-width: 100%;
+  height: auto;
+  max-height: 100%;
+}
+
+#portfolio .thumbnail-title {
+  font-size: 1.7rem;
+}
+
+#portfolio .thumbnail-link>a {
+  color: #fff;
+  background-color: #92c3f4;
+  width: 95%;
+  margin: 0 2.5%;
+}
+
+#portfolio .thumbnail-link>a:hover {
+  font-weight: 700;
+  background-color: #3a70a5;
+}
+
+/* Contact Section */
+#contact {
+  min-height: 600px;
+  background-color: #222;
+  color: #fff;
+  padding-top: 8rem;
+  padding-bottom: 5rem;
+}
+
+#contact .horizontal-rule {
+  border-color: #343a42;
+  opacity: 0.8;
+}
+
+#contact .contact-form {
+  width: 70%;
+  margin: 2rem auto;
+}
+
+#contact input {
+  display: block;
+  width: 100%;
+}
+
+#contact textarea {
+  width: 100%;
+  height: 80px;
+}
+
+#contact input.contact-button  {
+  color: #fff;
+  background-color: #3a70a5;
+}
+
+#contact input.contact-button:hover {
+  font-weight: 700;
+  background-color: #3a5fa5;
+}
+
+#contact .social-heading {
+  margin: 2rem 0;
+}
+
+#contact i {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+#contact i:hover {
+  color: #fff;
+}
+
+/* Footer */
+footer {
+  min-height: 100px;
+  padding: 2rem 0;
+  background-color: #343a40;
+  color: rgba(255, 255, 255, 0.5);
+}
