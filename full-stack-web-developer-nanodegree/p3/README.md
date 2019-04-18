@@ -33,20 +33,20 @@ Para este projeto, utiliza-se uma máquina virtual/virtual machine (VM) para rod
 
 1. Usando o terminal **logado em sua VM recém configurada**, execute o comando `psql news`. Isso fará com que você acesse a base de dados `newsdata.sql`
 1. Com o PostgreSQL em execução, execute os seguintes comandos:
-    * ```
+    ```
     CREATE VIEW views_per_article AS
     SELECT articles.author, articles.title, count(*) AS views
     FROM articles LEFT JOIN log ON log.path LIKE '%' || articles.slug
     GROUP BY articles.author, articles.title;
     ```
-    * ```
+    ```
     CREATE VIEW daily_requests AS
     SELECT time::date, count(*) as requests
     FROM log
     GROUP BY time::date
     ORDER BY time::date;
     ```
-    * ```
+    ```
     CREATE VIEW daily_errors AS
     SELECT time::date, count(*) as errors
     FROM log
@@ -54,7 +54,7 @@ Para este projeto, utiliza-se uma máquina virtual/virtual machine (VM) para rod
     GROUP BY time::date
     ORDER BY time::date;
     ```
-    * ```
+    ```
     CREATE VIEW error_percentiles AS
     SELECT daily_requests.time, daily_requests.requests, daily_errors.errors,
     round(daily_errors.errors * 100.00/daily_requests.requests, 2) as error_percentile
