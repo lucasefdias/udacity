@@ -1,0 +1,66 @@
+{% extends "layout.html" %}
+
+{% block styles %}
+    {{ super() }}
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+{% endblock %}
+
+{% block title %}
+    Index
+{% endblock %}
+
+{% block navbar %}
+    {{ super() }}
+{% endblock %}
+
+{% block main %}
+    <div class="outer-container row">
+        <div class="col-lg-3 col-md-4 col-sm-12">
+            <div class="item-title-div">
+                <h2 class="item-title">Categories</h2>
+            </div>
+
+            <div id="category-div">
+                <ul class="category-item-list">
+                {% for category in categories %}
+                    <li class="list-item">
+                        <a class="item" href="{{ url_for('category', category_name=category.name) }}">{{ category.name }}</a>
+                    </li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-lg-7 col-md-6 col-sm-12">
+
+            <div class="item-title-div">
+                <h2 class="item-title">{{ category_name }} Items</h2>
+            </div>
+
+            <div>
+                <ul class="category-item-list">
+                {% for item in items %}
+                    <li class="list-item">
+                        <a class="item" href="{{ url_for('item_show', category_name=category_name, item_id=item.id) }}">
+                            {{ item.title }}
+                        </a>
+                    </li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-md-2 col-sm-12">
+            {% if session['profile'] %}
+            <div id="btn-add-div" class="item-title-div">
+                <a class="btn-custom btn btn-success" href="{{ url_for('item_new') }}">Add Item</a>
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+
+{% endblock %}

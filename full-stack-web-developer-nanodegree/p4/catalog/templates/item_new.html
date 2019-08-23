@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+
+{% block styles %}
+    {{ super() }}
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+{% endblock %}
+
+{% block title %}
+    Index
+{% endblock %}
+
+{% block navbar %}
+    {{ super() }}
+{% endblock %}
+
+{% block main %}
+    <div class="outer-container row">
+        <div class="col-sm-12">
+            <div class="item-title-div">
+                <h2 class="item-title">New Item</h2>
+            </div>
+
+            <div class="form">
+                <form action="{{ url_for('item_new') }}" method="POST">
+                    <div class="form-input-div">
+                        <input class="form-input" name="title" type="text" placeholder="Item title" required/>
+                    </div>
+                    <div class="form-input-div">
+                        <textarea class="form-input" name="description" rows="6" cols="50" placeholder="Type the item description here." required></textarea>
+                    </div>
+                    <div class="form-input-div">
+                        <select class="form-input" name="category" required>
+                            <option selected disabled value="">Select a category</option>
+                            {% for category in categories %}
+                                <option value="{{ category.id }}">{{ category.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-input-div">
+                        <button class="btn-custom btn btn-success" type="submit">Add item</button>
+                    </div>
+
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+{% endblock %}

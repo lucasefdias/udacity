@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+
+{% block styles %}
+    {{ super() }}
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}
+
+{% block title %}
+    Login
+{% endblock %}
+
+{% block navbar %}
+    {{ super() }}
+{% endblock %}
+
+{% block main %}
+    <div class="outer-container row">
+        <div class="col-sm-12">
+            <div class="item-title-div">
+                <h2 class="item-title">Sign In</h2>
+            </div>
+
+            <div class="login-button">
+                <a id="btn-login" class="btn btn-primary btn-custom" href="/auth0/{{ state }}">Google</a>
+            </div>
+
+        </div>
+    </div>
+
+{% endblock %}

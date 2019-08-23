@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+
+{% block styles %}
+    {{ super() }}
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+{% endblock %}
+
+{% block title %}
+    Index
+{% endblock %}
+
+{% block navbar %}
+    {{ super() }}
+{% endblock %}
+
+{% block main %}
+    <div class="outer-container row">
+        <div class="col-sm-12">
+            <div class="item-title-div">
+                <h2 class="item-title">Delete Item</h2>
+            </div>
+
+            <div class="item-description-div">
+                <p class="item-description">
+                    Are you sure you want to delete {{ item.title }}?
+                </p>
+            </div>
+
+            <div>
+                <form class="form row" action="{{ url_for('item_delete', item_id=item.id) }}" method="POST">
+                    <div class="col-sm-1 col-md-2 col-lg 3"></div>
+                    <div class="col-sm-5 col-md-4 col-lg-3">
+                        <button class="btn-custom btn btn-danger" type="submit">Delete item</button>
+                    </div>
+                    <div class="col-sm-5 col-md-4 col-lg-3">
+                        <a class="btn-custom btn btn-success" href="{{ url_for('item_show', category_name=category_name, item_id=item.id) }}">Cancel</a>
+                    </div>
+                    <div class="col-sm-1 col-md-2 col-lg 3"></div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+{% endblock %}
