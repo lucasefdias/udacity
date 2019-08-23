@@ -42,6 +42,7 @@ Therefore, the VM must be installed and configured in your local operating syste
     * `populate_database.py` (script for populating the databse with initial data)
     * `query_all.py` (script for querying all data in database)
     * `README.md` (this file)
+    * `requirements.txt` (requirements file created with `pip freeze` for easier installation of dependencies)
 
 ### Virtual Machine installation and configuration
 
@@ -75,6 +76,7 @@ For Auth0:
 1. Download the `catalog` directory that contains this project
 1. Place `catalog` directory inside the **vagrant** directory **in your local machine**
 1. Using the terminal **logged in your recently configured VM**, run the command `cd /vagrant`. You can run `ls` to see the files and directories inside this file. Run `cd catalog/` to move into the project directory
+1. Run the command `pip install -r requirements.txt` to install project dependencies
 1. Run the following commands:
     ```
     python database_setup.py
@@ -96,6 +98,7 @@ For Auth0:
     ```
     python application.py
     ```
+1. Access your app on [http://localhost:8000](http://localhost:8000)
 1. Have fun!
 
 ## Licence
