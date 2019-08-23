@@ -1,5 +1,6 @@
 import React from 'react';
 import './App.css';
+import ErrorBoundary from './components/ErrorBoundary.js';
 import FoursquareAPI from './components/Foursquare.js';
 import MapContainer from './components/Map.js';
 import Navbar from './components/Navbar.js';
@@ -15,17 +16,14 @@ class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            isFilterOn: false,
+            query: '',
             selectedVenues: [],
             venues: [],
-            venuesRetrieved: false
+            venuesRetrieved: false,
+            activeMarker: null,
+            showingInfoWindow: false,
+            selectedVenue: null
         };
-        // Bind methods
-        this.getVenues = this.getVenues.bind(this);
-        this.turnFilterOn = this.turnFilterOn.bind(this);
-        this.resetFilter = this.resetFilter.bind(this);
-        this.resetSelectedVenues = this.resetSelectedVenues.bind(this);
-        this.updateSelectedVenues = this.updateSelectedVenues.bind(this);
     }
 
     // Required for AJAX request
@@ -45,7 +43,6 @@ class App extends React.Component {
         fetch(endpoint)
             .then(response => response.json())
             .then(result => {
-                console.log("API response received!");
                 let venuesResponse = result.response.groups[0].items;
                 let venues = [];
 
@@ -54,18 +51,12 @@ class App extends React.Component {
                     venues.push(venue.venue);
                 });
 
-                console.log("Old state:");
-                console.log(this.state);
-
                 // Update venues state
                 this.setState({
                     venues: venues,
                     venuesRetrieved: true,
                     selectedVenues: venues
                 });
-
-                console.log("New state:");
-                console.log(this.state);
             })
             .catch(error => {
                 console.error('Failed retrieving information', error);
@@ -76,50 +67,123 @@ class App extends React.Component {
     // ------------------------------------------
     // Filter methods
     // ------------------------------------------
-    resetFilter() {
+    // SearchBar
+    updateQuery = (queryString) => {
         this.setState({
-            isFilterOn: false
-        }, this.resetSelectedVenues);
+            query: queryString
+        }, this.filterByText);
     }
-    turnFilterOn() {
+    filterByText = () => {
+        // Array for filtered venues
+        let filteredVenues = [];
+        let query = this.state.query;
+
+        // If query string is not empty, search all venues for matches
+        if(query) {
+            this.state.venues.forEach(function(venue){
+                if(venue.name.toLowerCase().includes(query)){
+                    filteredVenues.push(venue);
+                }
+            });
+            this.updateSelectedVenues(filteredVenues);
+        }
+         // When query string is empty, simply reset selection to include all venues
+        else {
+            this.resetSelectedVenues();
+        }
+    }
+    resetVenueByText = () => {
         this.setState({
-            isFilterOn: true
+            selectedVenue: null
         });
     }
-    resetSelectedVenues() {
+
+    // SidebarItem select methods
+    filterByClick = (venue) => {
+        // Select clicked venue
+        this.selectVenue(venue);
+    }
+    resetFilter = () => {
+        // Reset selected venue and clear filters
+        this.resetVenue();
+    }
+
+    // ------------------------------------------
+    // Venue selection methods
+    // ------------------------------------------
+    resetSelectedVenues = () => {
         this.setState({
             selectedVenues: this.state.venues
         });
     }
-    updateSelectedVenues(newSelectedVenues) {
+    updateSelectedVenues = (newSelectedVenues) => {
         this.setState({
             selectedVenues: newSelectedVenues
         });
     }
+    selectVenue = (venue) => {
+        // Set state to selected venue
+        this.setState({
+            selectedVenue: venue
+        });
+        // Update query string and filter sidebar
+        this.updateQuery(venue.name.trim().toLowerCase());
+    }
+    resetVenue = () => {
+        // Set selected venue state to null
+        this.setState({
+            selectedVenue: null
+        });
+        // Update query string and filter sidebar
+        this.updateQuery('');
+    }
+
+
+    // ------------------------------------------
+    // Map methods
+    // ------------------------------------------
+    selectMarker = (marker) => {
+        // Manage state when marker is clicked
+        this.setState({
+            activeMarker: marker,
+            showingInfoWindow: true,
+            selectedVenue: marker.venue
+        });
+    }
+    onClose = (props) => {
+        // Manage state when InfoWindow is closed
+        if (this.state.showingInfoWindow) {
+            this.setState({
+                showingInfoWindow: false,
+                activeMarker: null,
+                selectedVenue: null
+            });
+        }
+    }
 
     render() {
-        // Define button method based on filter state
-        let buttonMethod;
-
-        if(this.state.isFilterOn) {
-            buttonMethod = this.resetFilter;
-        } else {
-            buttonMethod = this.turnFilterOn;
-        }
-
-        console.log()
         return (
             <div className="App">
-                <Navbar />
-                <Sidebar
-                    isFilterOn={this.state.isFilterOn}
-                    buttonMethod={buttonMethod}
-                    selectedVenues={this.state.selectedVenues}
-                    updateSelectedVenues={this.updateSelectedVenues}
-                    venuesRetrieved={this.venuesRetrieved}/>
-                <MapContainer
-                    selectedVenues={this.state.selectedVenues}
-                    venuesRetrieved={this.venuesRetrieved}/>
+                <ErrorBoundary>
+                    <Navbar />
+                </ErrorBoundary>
+                <ErrorBoundary>
+                    <Sidebar
+                        selectedVenues={this.state.selectedVenues}
+                        queryString={this.state.query}
+                        updateQuery={this.updateQuery}
+                        resetVenue={this.resetVenueByText}
+                        filterByClick={this.filterByClick}
+                        resetFilter={this.resetFilter}/>
+                </ErrorBoundary>
+                <ErrorBoundary>
+                    <MapContainer
+                        queryString={this.state.query}
+                        selectedVenue= {this.state.selectedVenue}
+                        selectedVenues={this.state.selectedVenues}
+                        venues={this.state.venues}
+                        venuesRetrieved={ this.state.venuesRetrieved}/>
+                </ErrorBoundary>
             </div>
         );
     }

@@ -10,6 +10,9 @@ class Navbar extends React.Component {
             <header className="App-header">
                 <nav className="Navbar">
                     <a className="Navbar-brand" href="/">Neighbourhood Map</a>
+                    <div className="Api-attribution">
+                        Powered by Google Maps and Foursquare API data
+                    </div>
                 </nav>
             </header>
         );

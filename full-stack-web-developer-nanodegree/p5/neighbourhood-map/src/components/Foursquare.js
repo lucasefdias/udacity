@@ -172,9 +172,6 @@ class Foursquare {
           limit
       );
 
-      console.log("API endpoint:");
-      console.log(url);
-
       return url;
   }
 }

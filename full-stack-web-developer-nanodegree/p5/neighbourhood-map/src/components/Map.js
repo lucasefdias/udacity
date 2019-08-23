@@ -3,6 +3,7 @@ import {Map, InfoWindow, Marker, GoogleApiWrapper} from 'google-maps-react';
 import '../App.css';
 import GoogleMapsAPI from './googleMapsConfig.js';
 
+// --------------------------------------------
 // Map components
 // --------------------------------------------
 export class MapContainer extends React.Component {
@@ -13,36 +14,62 @@ export class MapContainer extends React.Component {
             googleMapsConfig: GoogleMapsAPI,
             activeMarker: null,
             showingInfoWindow: false,
-            selectedVenue: null
+            markers: []
         };
-        // Bind methods
-        this.displaySelectedMarkers = this.displaySelectedMarkers.bind(this);
-        this.onMarkerClick = this.onMarkerClick.bind(this);
-        this.buildInfoWindowContent = this.buildInfoWindowContent.bind(this);
-        this.onClose = this.onClose.bind(this);
+        // Bind window (global) fallback method to component fallback
+        window.gm_authFailure = this.gm_authFailure;
     }
+
+    componentDidUpdate(prevProps){
+        // Get relevant props
+        const selectedVenue = this.props.selectedVenue;
+        const selectedVenues = this.props.selectedVenues;
+        const query = this.props.query;
+
+        // Initial setup
+        if(this.props.venuesRetrieved && this.props.venues !== prevProps.venues){
+            this.resetMarkers();
+        }
+
+        // Load markers on map once selected venues are updated in the parent component
+        // If there is any query text (either by selection or input) prevents re-render all markers
+        // (using filterMarkerOnMap instead)
+        else if (selectedVenues.length && (selectedVenues !== prevProps.selectedVenues)) {
+            if (!query) {
+                this.resetMarkers();
+            }
+        }
+
+        // Filter markers if props changed and update state
+        else if (selectedVenues !== prevProps.selectedVenues && query) {
+            this.filterMarkersOnMap();
+        }
+
+        // Animate selected venue marker whenever it is selected on the sidebar or clicked on map
+        if(selectedVenue && prevProps.selectedVenue){
+            if (selectedVenue.name !== prevProps.selectedVenue.name) {
+                this.setState({
+                    markers: this.animateSelectedMarker()
+                });
+            }
+        }
+    }
+
+    // -------------------------------
+    // Error handling
+    // -------------------------------
+    gm_authFailure = () => {
+        this.setState({
+            googleMapError: true
+        });
+    };
 
     // -------------------------------
     // Marker methods
     // -------------------------------
-    onMarkerClick(props, marker, e) {
-        // Turn on selected state
-        this.setState({
-            activeMarker: marker,
-            showingInfoWindow: true,
-            selectedVenue: marker.venue
-        });
-        console.log("selectedVenue:");
-        console.log(this.state.selectedVenue);
-        // Animate marker when clicked
-        marker.setAnimation(this.props.google.maps.Animation.BOUNCE);
-        setTimeout(function(){
-            marker.setAnimation(null);
-        }, 1400);
-    }
-    displaySelectedMarkers() {
+    loadMarkersOnMap = () => {
         // Get selected markers
-        const selectedVenues = this.props.selectedVenues
+        const selectedVenues = this.props.selectedVenues;
 
         // Get MapContainer context
         const mapContainer = this;
@@ -62,28 +89,91 @@ export class MapContainer extends React.Component {
                                 name={venue.name}
                                 id={venue.id}
                                 position={markerPosition}
-                                animation={mapContainer.props.google.maps.Animation.DROP}
-                                onClick={mapContainer.onMarkerClick} />);
+                                onClick={mapContainer.onMarkerClick}
+                                animation={mapContainer.props.google.maps.Animation.DROP} />);
             });
         }
 
         return markers;
     }
 
+    filterMarkersOnMap = () => {
+        const selectedVenues = this.props.selectedVenues;
+        let markers = this.state.markers;
+
+        // Loop through markers array to find which markers are selected in the filter
+        markers.forEach(function(marker){
+            // If a marker is present in the selection, set map to current map
+            if(!selectedVenues.includes(marker.venue)){
+                marker.setMap(null);
+            }
+        });
+
+        console.log(markers);
+
+        // Return the updated markers array
+        this.updateMarkers(markers);
+    }
+    updateMarkers = (markers) => {
+        this.setState({
+            markers: markers
+        });
+    }
+    resetMarkers = () => {
+        this.setState({
+            markers: this.loadMarkersOnMap()
+        });
+    }
+
+    onMarkerClick = (props, marker, e) => {
+        // Update father component state with selected marker
+        // this.props.onMarkerClick(marker);
+        // Animate marker
+        this.toggleBounce(marker);
+        // Build InfoWindow
+        this.buildInfoWindowContent(props);
+    }
+    toggleBounce = (marker) => {
+        if (marker.getAnimation() !== null) {
+          marker.setAnimation(null);
+        } else {
+          marker.setAnimation(this.props.google.maps.Animation.BOUNCE);
+        }
+    }
+    animateSelectedVenue = (venueId) => {
+        // destructure the app's state object into individual variables
+        const { map, markers, largeInfowindow } = this.state;
+
+        // Loop through markers array to find the impacted marker
+        markers.forEach(function(marker){
+            if (venueId === marker.venue.id) {
+                // Set animation for marker
+                marker.setAnimation(window.google.maps.Animation.BOUNCE);
+                // Open InfoWindow for the selected venue
+                // GoogleMap.populateInfoWindow(map, markers[i], largeInfowindow);
+            } else {
+                // Set animation of all other maps to null
+                marker.setAnimation(null);
+            }
+
+        });
+        // Return the updated markers array
+        return markers;
+    };
+
     // -------------------------------
     // InfoWindow methods
     // -------------------------------
-    onClose(props) {
+    onClose = (props) => {
         // Manage state
         if (this.state.showingInfoWindow) {
             this.setState({
                 showingInfoWindow: false,
-                activeMarker: null,
-                selectedVenue: null
+                activeMarker: null
             });
         }
     }
-    buildInfoWindowContent() {
+    buildInfoWindowContent = () => {
 
         // Manage Info Window Content
         let selectedVenue;
@@ -119,7 +209,7 @@ export class MapContainer extends React.Component {
         const zoom = this.state.googleMapsConfig.zoom;
 
         // Display all markers from selected venues
-        let markers = this.displaySelectedMarkers();
+        let markers = this.state.markers;
 
         // Manage Info Window Content
         let selectedVenue = this.buildInfoWindowContent();
