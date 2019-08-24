@@ -134,6 +134,10 @@ sudo nano /etc/ssh/sshd_config
 ```
 sudo service ssh restart  
 ```
+1. To access the server through SSH now you have to provide the port parameter (`-p 2200`):
+```
+ssh -i ~/.ssh/id_rsa grader@52.35.206.69 -p 2200
+```
 
 #### Configure the Uncomplicated Firewall (UFW)
 
