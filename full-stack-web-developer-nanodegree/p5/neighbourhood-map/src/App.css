@@ -1,6 +1,9 @@
 /* ------------------------- */
 /* Error Boundary
 /* ------------------------- */
+#errorBoundary {
+    margin: 20vh 20vw;
+}
 details {
     white-space: pre-wrap;
 }
@@ -235,4 +238,12 @@ details {
     #description {
         margin: 0.4rem 0;
     }
+}
+/* ------------------------- */
+/* VenueInfoBox
+/* ------------------------- */
+#venueInfoBox {
+    margin: 10vh;
+    background-color: #fff;
+    z-index: 100;
 }

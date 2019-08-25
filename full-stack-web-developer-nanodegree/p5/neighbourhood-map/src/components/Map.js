@@ -2,6 +2,7 @@ import React from 'react'
 import {Map, InfoWindow, Marker, GoogleApiWrapper} from 'google-maps-react';
 import '../App.css';
 import GoogleMapsAPI from './googleMapsConfig.js';
+// import VenueInfoBox from './VenueInfoBox.js';
 
 // --------------------------------------------
 // Map components
@@ -11,48 +12,11 @@ export class MapContainer extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            googleMapsConfig: GoogleMapsAPI,
-            activeMarker: null,
-            showingInfoWindow: false,
-            markers: []
+            googleMapsConfig: GoogleMapsAPI
         };
+
         // Bind window (global) fallback method to component fallback
         window.gm_authFailure = this.gm_authFailure;
-    }
-
-    componentDidUpdate(prevProps){
-        // Get relevant props
-        const selectedVenue = this.props.selectedVenue;
-        const selectedVenues = this.props.selectedVenues;
-        const query = this.props.query;
-
-        // Initial setup
-        if(this.props.venuesRetrieved && this.props.venues !== prevProps.venues){
-            this.resetMarkers();
-        }
-
-        // Load markers on map once selected venues are updated in the parent component
-        // If there is any query text (either by selection or input) prevents re-render all markers
-        // (using filterMarkerOnMap instead)
-        else if (selectedVenues.length && (selectedVenues !== prevProps.selectedVenues)) {
-            if (!query) {
-                this.resetMarkers();
-            }
-        }
-
-        // Filter markers if props changed and update state
-        else if (selectedVenues !== prevProps.selectedVenues && query) {
-            this.filterMarkersOnMap();
-        }
-
-        // Animate selected venue marker whenever it is selected on the sidebar or clicked on map
-        if(selectedVenue && prevProps.selectedVenue){
-            if (selectedVenue.name !== prevProps.selectedVenue.name) {
-                this.setState({
-                    markers: this.animateSelectedMarker()
-                });
-            }
-        }
     }
 
     // -------------------------------
@@ -67,123 +31,94 @@ export class MapContainer extends React.Component {
     // -------------------------------
     // Marker methods
     // -------------------------------
-    loadMarkersOnMap = () => {
-        // Get selected markers
-        const selectedVenues = this.props.selectedVenues;
+    getVisibleMarkers = () => {
+        // Get markers and context
+        const markers = this.props.markers;
+        const mapComponent = this;
 
-        // Get MapContainer context
-        const mapContainer = this;
+        // Visible markers array
+        let visibleMarkers;
 
-        let markers = [];
-
-        // Check if there is any selected venue and loop through array to build markers
-        if(selectedVenues) {
-            selectedVenues.forEach(function(venue){
-                let markerPosition = {
-                    lat: venue.location.lat,
-                    lng: venue.location.lng
-                }
-                markers.push(<Marker
-                                venue={venue}
-                                key={venue.id}
-                                name={venue.name}
-                                id={venue.id}
-                                position={markerPosition}
-                                onClick={mapContainer.onMarkerClick}
-                                animation={mapContainer.props.google.maps.Animation.DROP} />);
-            });
+        // If markers array is loaded, filter visible markers and map them to
+        // visibleMarkers array
+        if(markers) {
+            visibleMarkers = markers
+                                .filter(marker => marker.isVisible)
+                                .map((marker, index, arr) => {
+                                    // Select appropriate animation
+                                    let animation = mapComponent.setMarkerAnimation(marker, arr);
+                                    return(
+                                        <Marker
+                                            name={marker.venue.name}
+                                            id={marker.venue.id}
+                                            key={marker.venue.id}
+                                            position={
+                                                {
+                                                    lat: marker.lat,
+                                                    lng: marker.lng
+                                                }
+                                            }
+                                            animation={animation}
+                                            onClick={mapComponent.onMarkerClick}
+                                            venue={marker.venue}
+                                            isOpen= {marker.isOpen} />
+                                    );
+                                });
         }
 
-        return markers;
+        return visibleMarkers;
     }
-
-    filterMarkersOnMap = () => {
-        const selectedVenues = this.props.selectedVenues;
-        let markers = this.state.markers;
-
-        // Loop through markers array to find which markers are selected in the filter
-        markers.forEach(function(marker){
-            // If a marker is present in the selection, set map to current map
-            if(!selectedVenues.includes(marker.venue)){
-                marker.setMap(null);
-            }
-        });
-
-        console.log(markers);
-
-        // Return the updated markers array
-        this.updateMarkers(markers);
-    }
-    updateMarkers = (markers) => {
-        this.setState({
-            markers: markers
-        });
-    }
-    resetMarkers = () => {
-        this.setState({
-            markers: this.loadMarkersOnMap()
-        });
-    }
-
     onMarkerClick = (props, marker, e) => {
-        // Update father component state with selected marker
-        // this.props.onMarkerClick(marker);
-        // Animate marker
-        this.toggleBounce(marker);
-        // Build InfoWindow
-        this.buildInfoWindowContent(props);
+        console.log("CLICKED MARKER:");
+        console.log(marker);
+        this.props.handleMarkerClick(marker);
     }
-    toggleBounce = (marker) => {
-        if (marker.getAnimation() !== null) {
-          marker.setAnimation(null);
-        } else {
-          marker.setAnimation(this.props.google.maps.Animation.BOUNCE);
+    setMarkerAnimation = (marker, arr) => {
+        // Get relevant props
+        const google = this.props.google;
+        const markerSelected = this.props.markerSelected;
+        const query = this.props.query;
+        const markers = this.props.markers;
+
+        // Initially, animation is set to null
+        let animation = null;
+
+        // If a marker is open (selected) it should bounce
+        if(marker.isOpen){
+            animation = google.maps.Animation.BOUNCE;
         }
+        // If no marker is selected and all markers are visible and no query
+        // is active, the marker should drop (re-enter)
+        else if(!markerSelected && !query && arr.length === markers.length) {
+            animation = google.maps.Animation.DROP;
+        }
+
+        return animation;
     }
-    animateSelectedVenue = (venueId) => {
-        // destructure the app's state object into individual variables
-        const { map, markers, largeInfowindow } = this.state;
-
-        // Loop through markers array to find the impacted marker
-        markers.forEach(function(marker){
-            if (venueId === marker.venue.id) {
-                // Set animation for marker
-                marker.setAnimation(window.google.maps.Animation.BOUNCE);
-                // Open InfoWindow for the selected venue
-                // GoogleMap.populateInfoWindow(map, markers[i], largeInfowindow);
-            } else {
-                // Set animation of all other maps to null
-                marker.setAnimation(null);
-            }
-
-        });
-        // Return the updated markers array
-        return markers;
-    };
+    triggerMarkerClick = (selectedVenue, visibleMarkers) => {
+        this.props.google.maps.event.trigger(
+            visibleMarkers.find(marker => marker.props.id === selectedVenue.id), 'click');
+    }
 
     // -------------------------------
     // InfoWindow methods
     // -------------------------------
-    onClose = (props) => {
-        // Manage state
-        if (this.state.showingInfoWindow) {
-            this.setState({
-                showingInfoWindow: false,
-                activeMarker: null
-            });
-        }
-    }
     buildInfoWindowContent = () => {
 
         // Manage Info Window Content
         let selectedVenue;
 
-        // Check for a selected venue in state. If there is no selected venue,
+        // Check for an active marker or click filter.
+        // If there is no selected marker or location on sidebar,
         // build a default object (this avoid errors like "Cannot read property
         // 'x' of undefined")
-        if(this.state.selectedVenue) {
-            selectedVenue = this.state.selectedVenue;
-        } else {
+        if(this.props.activeMarker) {
+            selectedVenue = this.props.activeMarker.venue;
+        }
+        else if(this.props.clickFilterActive) {
+            selectedVenue = this.props.selectedVenue;
+        }
+        else {
             selectedVenue = {
                 name: "Default name",
                 location: {
@@ -202,44 +137,53 @@ export class MapContainer extends React.Component {
 
         return selectedVenue;
     }
+    onClose = () => {
+        this.props.handleInfoWindowClose();
+    }
 
     render() {
-        // Get props and state
+        // Get relevant props and state
         const center = this.state.googleMapsConfig.center;
         const zoom = this.state.googleMapsConfig.zoom;
+        const google = this.props.google;
 
-        // Display all markers from selected venues
-        let markers = this.state.markers;
+        // Display all markers filtered (visible) markers
+        let visibleMarkers = this.getVisibleMarkers();
 
-        // Manage Info Window Content
+        // Build InfoWindow
         let selectedVenue = this.buildInfoWindowContent();
 
+        if(this.props.clickFilterActive) {
+            this.triggerMarkerClick(this.props.selectedVenue, visibleMarkers);
+        }
+
         return (
-          <Map
-            google={this.props.google}
-            initialCenter={center}
-            zoom={zoom}>
-            {markers}
-            <InfoWindow
-                marker={this.state.activeMarker}
-                visible={this.state.showingInfoWindow}
-                onClose={this.onClose}>
-                <div id="infoWindow">
-                    <h3 id="venueName">
-                    {selectedVenue.name}
-                    </h3>
-                    <h5 id="address">
-                    {selectedVenue.location.formattedAddress.join()}
-                    </h5>
-                    <p id="description">
-                        <strong>
-                            Category:
-                        </strong>
-                        {selectedVenue.categories[0].name}
-                    </p>
-                </div>
-            </InfoWindow>
-          </Map>
+            <Map
+                google={google}
+                initialCenter={center}
+                zoom={zoom}
+                >
+                {visibleMarkers}
+                <InfoWindow
+                    marker={this.props.activeMarker}
+                    visible={this.props.markerSelected}
+                    onClose={this.onClose}>
+                    <div id="infoWindow">
+                        <h3 id="venueName">
+                        {selectedVenue.name}
+                        </h3>
+                        <h5 id="address">
+                        {selectedVenue.location.formattedAddress.join()}
+                        </h5>
+                        <p id="description">
+                            <strong>
+                                Category:
+                            </strong>
+                            {selectedVenue.categories[0].name}
+                        </p>
+                    </div>
+                </InfoWindow>
+            </Map>
         );
     }
 }

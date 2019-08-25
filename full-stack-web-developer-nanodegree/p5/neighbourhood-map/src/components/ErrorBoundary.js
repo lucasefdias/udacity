@@ -23,7 +23,7 @@ class ErrorBoundary extends React.Component {
         // If there is an error, return error information
         if (this.state.errorInfo) {
             return (
-                <div>
+                <div id="errorBoundary">
                     <h2>Oops ... something went wrong. :/</h2>
                     <details>
                         {this.state.error && this.state.error.toString()}
