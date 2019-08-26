@@ -77,7 +77,20 @@ class App extends React.Component {
             })
             .catch(error => {
                 console.error('Failed retrieving information', error);
+                this.renderForusquareError();
             });
+    }
+
+    renderForusquareError = () => {
+        let mapElement = document.getElementById("map");
+        mapElement.innerHTML = ""
+        let errorDiv = document.createElement('div');
+        errorDiv.className = 'GoogleMaps-error';
+        errorDiv.innerHTML = "";
+        errorDiv.innerHTML += '<div id="errorBoundary">';
+        errorDiv.innerHTML += '<h2>Foursquare error</h2>';
+        errorDiv.innerHTML += '<p>Oops! We could load Foursquare locations :/ Check your API key for any possible errors</p>';
+        mapElement.appendChild(errorDiv);
     }
 
 
