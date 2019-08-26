@@ -5,7 +5,6 @@ import FoursquareAPI from './components/Foursquare.js';
 import MapContainer from './components/Map.js';
 import Navbar from './components/Navbar.js';
 import Sidebar from './components/Sidebar.js';
-// import VenueInfoBox from './components/VenueInfoBox.js';
 
 
 // --------------------------------------------

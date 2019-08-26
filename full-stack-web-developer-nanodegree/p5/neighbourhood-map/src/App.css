@@ -168,8 +168,8 @@ details {
 }
 #infoWindow {
     text-align: center;
-    width: 20vw;
-    height: 20vh;
+    width: 15vw;
+    height: 15vh;
 }
 #venueName {
     font-size: 1.1rem;
@@ -187,10 +187,16 @@ details {
 }
 
 /* Responsive CSS */
+@media screen and (max-width: 1220px) {
+    #infoWindow {
+        width: 25vw;
+        height: 20vh;
+    }
+}
 @media screen and (max-width: 900px) {
     #infoWindow {
-        width: 30vw;
-        height: 30vh;
+        width: 27vw;
+        height: 20vh;
     }
     #venueName {
         font-size: 1rem;
@@ -207,43 +213,29 @@ details {
 }
 @media screen and (max-width: 700px) {
     #infoWindow {
-        width: 40vw;
-        height: 35vh;
+        width: 30vw;
+        height: 25vh;
     }
     #venueName {
-        font-size: 0.9rem;
+        font-size: 1rem;
         margin-bottom: 0.3rem;
     }
     #address {
         margin: 0.4rem 0;
-        font-size: 0.7rem;
     }
     #description {
         margin: 0.4rem 0;
     }
 }
 @media screen and (max-width: 550px) {
-    #infoWindow {
-        width: 50vw;
-        height: 40vh;
-    }
     #venueName {
-        font-size: 0.9rem;
         margin-bottom: 0.3rem;
     }
     #address {
         margin: 0.4rem 0;
-        font-size: 0.7rem;
+        font-size: 0.8rem;
     }
     #description {
         margin: 0.4rem 0;
     }
-}
-/* ------------------------- */
-/* VenueInfoBox
-/* ------------------------- */
-#venueInfoBox {
-    margin: 10vh;
-    background-color: #fff;
-    z-index: 100;
 }

@@ -2,7 +2,6 @@ import React from 'react'
 import {Map, InfoWindow, Marker, GoogleApiWrapper} from 'google-maps-react';
 import '../App.css';
 import GoogleMapsAPI from './googleMapsConfig.js';
-// import VenueInfoBox from './VenueInfoBox.js';
 
 // --------------------------------------------
 // Map components
@@ -15,8 +14,17 @@ export class MapContainer extends React.Component {
             googleMapsConfig: GoogleMapsAPI
         };
 
+        this.references = {};
+
         // Bind window (global) fallback method to component fallback
         window.gm_authFailure = this.gm_authFailure;
+    }
+
+    getOrCreateRef = (id) => {
+        if (!this.references.hasOwnProperty(id)) {
+            this.references[id] = React.createRef();
+        }
+        return this.references[id];
     }
 
     // -------------------------------
@@ -49,6 +57,7 @@ export class MapContainer extends React.Component {
                                     let animation = mapComponent.setMarkerAnimation(marker, arr);
                                     return(
                                         <Marker
+                                            ref={mapComponent.getOrCreateRef(marker.venue.id)}
                                             name={marker.venue.name}
                                             id={marker.venue.id}
                                             key={marker.venue.id}
@@ -69,8 +78,6 @@ export class MapContainer extends React.Component {
         return visibleMarkers;
     }
     onMarkerClick = (props, marker, e) => {
-        console.log("CLICKED MARKER:");
-        console.log(marker);
         this.props.handleMarkerClick(marker);
     }
     setMarkerAnimation = (marker, arr) => {
@@ -94,10 +101,6 @@ export class MapContainer extends React.Component {
         }
 
         return animation;
-    }
-    triggerMarkerClick = (selectedVenue, visibleMarkers) => {
-        this.props.google.maps.event.trigger(
-            visibleMarkers.find(marker => marker.props.id === selectedVenue.id), 'click');
     }
 
     // -------------------------------
@@ -140,6 +143,25 @@ export class MapContainer extends React.Component {
     onClose = () => {
         this.props.handleInfoWindowClose();
     }
+    setInfoWindowMarker = () => {
+        // Get relevant props
+        const activeMarker = this.props.activeMarker;
+        const clickFilterActive = this.props.clickFilterActive;
+        const selectedVenue = this.props.selectedVenue;
+
+        let infoWindowMarker = null;
+
+        // Check first for the simplest case (activeMarker is not null)
+        if(activeMarker) {
+            infoWindowMarker = activeMarker;
+        }
+        // Then check if click filter is active, which means that there is a selected venue
+        else if(clickFilterActive) {
+            infoWindowMarker = this.references[selectedVenue.id].current["marker"];
+        }
+
+        return infoWindowMarker;
+    }
 
     render() {
         // Get relevant props and state
@@ -152,10 +174,7 @@ export class MapContainer extends React.Component {
 
         // Build InfoWindow
         let selectedVenue = this.buildInfoWindowContent();
-
-        if(this.props.clickFilterActive) {
-            this.triggerMarkerClick(this.props.selectedVenue, visibleMarkers);
-        }
+        let infoWindowMarker = this.setInfoWindowMarker();
 
         return (
             <Map
@@ -165,7 +184,12 @@ export class MapContainer extends React.Component {
                 >
                 {visibleMarkers}
                 <InfoWindow
-                    marker={this.props.activeMarker}
+                    position={
+                        infoWindowMarker
+                        ? infoWindowMarker.position
+                        : null
+                    }
+                    pixelOffset={new google.maps.Size(0,-50)}
                     visible={this.props.markerSelected}
                     onClose={this.onClose}>
                     <div id="infoWindow">

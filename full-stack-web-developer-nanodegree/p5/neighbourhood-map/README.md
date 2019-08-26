@@ -22,10 +22,12 @@ The map is rendered using the [Google Maps JavaScript API](https://developers.go
 
   * `src/` (directory that contains the main JavaScript and CSS files for the app to function):
       * `components/` (directory for React components):
+        * `ErrorBoundary.js` (wrapper that manages React component errors)
         * `Foursquare.js` (configures the Foursquare API for use inside the app)
         * `googleMapsConfig.js` (configures the Google Maps API for use inside the app)
         * `Map.js` (code for the Map component, which renders the map and its corresponding children - Markers, InfoWindows...)
         * `Navbar.js` (code for the Navbar fixed at the top of the app)
+        * `SearchBar.js` (code for the SearchBar that filters venues by text)
         * `Sidebar.js` (code for the Sidebar that appears when the menu icon is clicked. It handles venue filtering.)
       * `App.css` (main css file for the app)
      * `App.js` (main JavaScript file. Contains the code for the App React component.)
