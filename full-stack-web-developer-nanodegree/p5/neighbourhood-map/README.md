@@ -67,6 +67,14 @@ For Foursquare API:
 1. Create the credentials (`client_id` and `client_secret`)
 1. Input your crendetials inside the `Foursquare.js` file.
 
+## References and inspiration
+
+* [React docs](https://pt-br.reactjs.org/docs/getting-started.html)
+* [Stack Overflow: React: how to forward refs to multiple children?](https://stackoverflow.com/questions/53718430/react-how-to-forward-refs-to-multiple-children)
+* [fullstackreact/google-maps-react](https://github.com/fullstackreact/google-maps-react)
+* [Forrest Walker's Walkthrough](https://www.youtube.com/playlist?list=PL4rQq4MQP1crXuPtruu_eijgOUUXhcUCP)
+* [Yahya Elharony's Explanation](https://www.youtube.com/playlist?list=PLgOB68PvvmWCGNn8UMTpcfQEiITzxEEA1)
+
 ## Licence
 
 [MIT](https://opensource.org/licenses/MIT)
