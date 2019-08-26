@@ -20,6 +20,9 @@ export class MapContainer extends React.Component {
         window.gm_authFailure = this.gm_authFailure;
     }
 
+    // -------------------------------
+    // Refs handling
+    // -------------------------------
     getOrCreateRef = (id) => {
         if (!this.references.hasOwnProperty(id)) {
             this.references[id] = React.createRef();
@@ -31,10 +34,16 @@ export class MapContainer extends React.Component {
     // Error handling
     // -------------------------------
     gm_authFailure = () => {
-        this.setState({
-            googleMapError: true
-        });
-    };
+        let mapElement = document.getElementById("map");
+        mapElement.innerHTML = ""
+        let errorDiv = document.createElement('div');
+        errorDiv.className = 'GoogleMaps-error';
+        errorDiv.innerHTML = "";
+        errorDiv.innerHTML += '<div id="errorBoundary">';
+        errorDiv.innerHTML += '<h2>Google Maps error</h2>';
+        errorDiv.innerHTML += '<p>Oops! We could load Google Maps :/ Check your API key for any possible errors</p>';
+        mapElement.appendChild(errorDiv);
+    }
 
     // -------------------------------
     // Marker methods
@@ -177,6 +186,7 @@ export class MapContainer extends React.Component {
         let infoWindowMarker = this.setInfoWindowMarker();
 
         return (
+            <div id="map">
             <Map
                 google={google}
                 initialCenter={center}
@@ -208,6 +218,7 @@ export class MapContainer extends React.Component {
                     </div>
                 </InfoWindow>
             </Map>
+            </div>
         );
     }
 }

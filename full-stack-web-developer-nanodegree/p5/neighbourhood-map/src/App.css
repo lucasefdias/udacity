@@ -159,11 +159,11 @@ details {
 /* Map
 /* ------------------------- */
 .GoogleMaps-error{
-    margin: 20vh;
+    margin: 20vh 20vw;
     text-align: center;
 }
 #map {
-    height: 100vh;
+    height: 10vh;
     z-index: 0;
 }
 #infoWindow {
