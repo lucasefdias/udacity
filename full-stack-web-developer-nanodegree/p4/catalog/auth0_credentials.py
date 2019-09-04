@@ -3,11 +3,11 @@ class Auth0:
 
     def __init__(self):
         # Input your Auth0 parameters here
-        self.client_id = 'VFLcuGdWEwCE9pgz3xNBUcFAR8JPIPyy'
+        self.client_id = 'YOUR_CLIENT_ID'
         self.client_secret = (
-            'bIch44aEgIGkFWqtQdfkxxUzDYma0bHe1ryPQuso23BuixpMswcUm_HynBLhifNM'
+            'YOUR_CLIENT_SECRET'
             )
-        self.api_base_url = 'https://dev-71lnfuf3.auth0.com'
+        self.api_base_url = 'YOUR_API_BASE_URL'
         self.audience = self.api_base_url + '/userinfo'
 
 
