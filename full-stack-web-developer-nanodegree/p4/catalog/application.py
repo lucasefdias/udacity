@@ -9,6 +9,7 @@ from models import Category, Item, User
 # Auth0 imports
 from authlib.flask.client import OAuth
 from six.moves.urllib.parse import urlencode
+from auth0_credentials import auth0_config
 
 import json
 import random
@@ -21,14 +22,15 @@ app.secret_key = 'mysecretkey'
 # Initialize Auth0
 oauth = OAuth(app)
 
+# Config Auth0 credentials
 auth0 = oauth.register(
     'auth0',
-    client_id='VFLcuGdWEwCE9pgz3xNBUcFAR8JPIPyy',
-    client_secret=(
-        'bIch44aEgIGkFWqtQdfkxxUzDYma0bHe1ryPQuso23BuixpMswcUm_HynBLhifNM'),
-    api_base_url='https://dev-71lnfuf3.auth0.com',
-    access_token_url='https://dev-71lnfuf3.auth0.com/oauth/token',
-    authorize_url='https://dev-71lnfuf3.auth0.com/authorize',
+    client_id=auth0_config.client_id,
+    client_secret=auth0_config.client_secret,
+    api_base_url=auth0_config.api_base_url,
+    access_token_url=auth0_config.api_base_url + '/token',
+    authorize_url=auth0_config.api_base_url + '/authorize',
+    audience=auth0_config.audience,
     client_kwargs={
         'scope': 'openid profile',
     },
@@ -108,7 +110,7 @@ def auth0_trigger_authentication(state):
 
     return auth0.authorize_redirect(
         redirect_uri=url_for('auth0_callback', _external=True),
-        audience='https://dev-71lnfuf3.auth0.com/userinfo')
+        audience=auth0.audience)
 
 
 @app.route('/auth0_callback')
